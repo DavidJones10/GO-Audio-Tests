@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/Binozo/GoAlsa/pkg/alsa"
 )
@@ -43,17 +44,17 @@ func main() {
 	go func() (err error) {
 		for {
 			numSamples, err := captureDevice.Read(readBuffer)
-			fmt.Println("Num samples in last read: ", numSamples)
 			if err != nil {
-				return fmt.Errorf("error reading capture device")
+				return fmt.Errorf("error reading capture device, %v", err)
 			}
+			fmt.Println("Num samples in last read: ", numSamples)
 			copy(writeBuffer, readBuffer)
 			numSamples, err = playbackDevice.Write(writeBuffer)
-			fmt.Println("Num samples in last write: ", numSamples)
 			if err != nil {
-				return fmt.Errorf("error writing to playback device")
+				return fmt.Errorf("error writing to playback device, %v", err)
 			}
-
+			fmt.Println("Num samples in last write: ", numSamples)
+			time.Sleep(time.Millisecond * 20)
 		}
 	}()
 
