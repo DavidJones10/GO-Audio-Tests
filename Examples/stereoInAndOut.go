@@ -53,7 +53,7 @@ func main() {
 			}
 			numSamples, err = playbackDevice.Write(writeBuffer)
 			if err != nil {
-				fmt.Println("Num samples in last write: ", numSamples)
+				//fmt.Println("Num samples in last write: ", numSamples)
 				return fmt.Errorf("error writing to playback device, %w", err)
 			}
 			time.Sleep(time.Millisecond * 20)
