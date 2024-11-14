@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/cocoonlife/goalsa"
 )
@@ -46,8 +47,9 @@ func main() {
 			numSamples, err = playbackDevice.Write(writeBuffer)
 			fmt.Println("Num samples in last write: ", numSamples)
 			if err != nil {
-				return fmt.Errorf("error writing to capture device")
+				return fmt.Errorf("error writing to playback device")
 			}
+			time.Sleep(25 * time.Millisecond)
 
 		}
 	}()
