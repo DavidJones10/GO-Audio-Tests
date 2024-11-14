@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/xthexder/go-jack"
 )
@@ -11,13 +12,23 @@ var channels int = 2
 var PortsIn []*jack.Port
 var PortsOut []*jack.Port
 
+func int16ToAudioSample(sample int16) jack.AudioSample {
+	return jack.AudioSample(float32(sample) / 32767)
+}
+
+func AudioSampleToInt16(sample jack.AudioSample) int16 {
+	clamped := math.Max(-1.0, math.Min(1.0, float64(sample)))
+	return int16(clamped * 32767)
+}
+
 func process(nframes uint32) int {
 	for i, in := range PortsIn {
 		samplesIn := in.GetBuffer(nframes)
 		samplesOut := PortsOut[i].GetBuffer(nframes)
 		for i2, sample := range samplesIn {
-			samplesOut[i2] = sample
-			fmt.Println("Sample: ", sample)
+			intSample := AudioSampleToInt16(sample)
+			samplesOut[i2] = int16ToAudioSample(intSample)
+			fmt.Println("Sample: ", intSample)
 		}
 	}
 	return 0
