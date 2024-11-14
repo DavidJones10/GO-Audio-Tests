@@ -18,11 +18,11 @@ func main() {
 	defer portaudio.Terminate()
 
 	// Create an input buffer to store the incoming audio data
-	inputBuffer := make([]int16, bufferSize*numChannels)
-	outputBuffer := make([]int16, bufferSize*numChannels)
+	// inputBuffer := make([]int16, bufferSize*numChannels)
+	// outputBuffer := make([]int16, bufferSize*numChannels)
 
 	// Open the default input and output streams
-	stream, err := portaudio.OpenDefaultStream(numChannels, numChannels, sampleRate, bufferSize, inputBuffer, outputBuffer)
+	stream, err := portaudio.OpenDefaultStream(numChannels, numChannels, sampleRate, bufferSize, processAudio)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,20 +33,10 @@ func main() {
 		log.Fatal(err)
 	}
 	defer stream.Stop()
+}
 
-	// Main loop to read input and immediately write it to the output
-	for {
-		// Read input audio
-		if err := stream.Read(); err != nil {
-			log.Fatal(err)
-		}
-
-		// Copy the input to the output buffer (loopback)
-		copy(outputBuffer, inputBuffer)
-
-		// Write output audio
-		if err := stream.Write(); err != nil {
-			log.Fatal(err)
-		}
+func processAudio(in, out []int16) {
+	for sample := 0; sample < len(out); sample++ {
+		out[sample] = in[sample]
 	}
 }
