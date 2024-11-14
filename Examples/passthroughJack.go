@@ -33,7 +33,7 @@ func main() {
 	}
 	defer myClient.Close()
 
-	echoCancelSource, status := jack.ClientOpen("Echo-Cancel Source", jack.UseExactName)
+	echoCancelSource, status := jack.ClientOpen("Echo-Cancel Source", jack.LoadName)
 	if status != 0 {
 		fmt.Println("Status:", jack.StrError(status))
 		return
