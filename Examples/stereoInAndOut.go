@@ -10,7 +10,7 @@ import (
 func main() {
 	portaudio.Initialize()
 	defer portaudio.Terminate()
-	e := newEcho(time.Second / 3)
+	e := newEcho(time.Second / 30)
 	defer e.Close()
 	chk(e.Start())
 	time.Sleep(4 * time.Second)
@@ -36,8 +36,10 @@ func newEcho(delay time.Duration) *echo {
 	p := portaudio.LowLatencyParameters(h.DefaultInputDevice, h.DefaultOutputDevice)
 	p.Input.Channels = 1
 	p.Output.Channels = 1
+	fmt.Println("made it 1")
 	e := &echo{buffer: make([]float32, int(p.SampleRate*delay.Seconds()))}
 	e.Stream, err = portaudio.OpenStream(p, e.processAudio)
+	fmt.Println("made it 2")
 	chk(err)
 	return e
 }
