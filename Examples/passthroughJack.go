@@ -21,8 +21,9 @@ func AudioSampleToInt16(sample jack.AudioSample) int16 {
 	return int16(clamped * 32767)
 }
 
+var maxFloat float32 = 0
+
 func process(nframes uint32) int {
-	maxFloat := float32(0)
 	for i, in := range PortsIn {
 		samplesIn := in.GetBuffer(nframes)
 		samplesOut := PortsOut[i].GetBuffer(nframes)
