@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
 
 	"github.com/cocoonlife/goalsa"
 )
@@ -35,4 +37,9 @@ func main() {
 
 		}
 	}()
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt)
+	<-sigCh
+	fmt.Println("Exiting...")
 }
