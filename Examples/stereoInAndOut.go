@@ -45,13 +45,13 @@ func main() {
 		for {
 			numSamples, err := captureDevice.Read(readBuffer)
 			if err != nil {
-				return fmt.Errorf("error reading capture device, %v", err)
+				return fmt.Errorf("error reading capture device, %w", err)
 			}
 			fmt.Println("Num samples in last read: ", numSamples)
 			copy(writeBuffer, readBuffer)
 			numSamples, err = playbackDevice.Write(writeBuffer)
 			if err != nil {
-				return fmt.Errorf("error writing to playback device, %v", err)
+				return fmt.Errorf("error writing to playback device, %w", err)
 			}
 			fmt.Println("Num samples in last write: ", numSamples)
 			time.Sleep(time.Millisecond * 20)
