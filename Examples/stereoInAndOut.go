@@ -10,10 +10,10 @@ import (
 func main() {
 	portaudio.Initialize()
 	defer portaudio.Terminate()
-	e := newEcho(time.Second / 30)
+	e := newEcho(time.Second / 1)
 	defer e.Close()
 	chk(e.Start())
-	time.Sleep(4 * time.Second)
+	time.Sleep(40 * time.Second)
 	chk(e.Stop())
 }
 
