@@ -33,31 +33,13 @@ func main() {
 	}
 	defer myClient.Close()
 
-	echoCancelSource, status := jack.ClientOpen("Echo-Cancel Source", jack.LoadName)
-	if status != 0 {
-		fmt.Println("Status:", jack.StrError(status))
-		return
-	}
-	defer echoCancelSource.Close()
-
-	echoCancelSink, status := jack.ClientOpen("Echo-Cancel Sink", jack.UseExactName)
-	if status != 0 {
-		fmt.Println("Status:", jack.StrError(status))
-		return
-	}
-	defer echoCancelSink.Close()
-
 	portIn1 := myClient.PortRegister("Lane1Input", jack.DEFAULT_AUDIO_TYPE, jack.PortIsInput, 0)
 	portIn2 := myClient.PortRegister("Lane2Input", jack.DEFAULT_AUDIO_TYPE, jack.PortIsInput, 0)
 	PortsIn = append(PortsIn, portIn1, portIn2)
-	myClient.ConnectPorts(echoCancelSource.GetPortByName("capture_FL"), portIn1)
-	myClient.ConnectPorts(echoCancelSource.GetPortByName("capture_FR"), portIn2)
 
 	portOut1 := myClient.PortRegister("Lane_1_Output", jack.DEFAULT_AUDIO_TYPE, jack.PortIsOutput, 0)
 	portOut2 := myClient.PortRegister("Lane_2_Output", jack.DEFAULT_AUDIO_TYPE, jack.PortIsOutput, 0)
 	PortsOut = append(PortsOut, portOut1, portOut2)
-	myClient.ConnectPorts(echoCancelSink.GetPortByName("playback_FL"), portIn1)
-	myClient.ConnectPorts(echoCancelSink.GetPortByName("playback_FR"), portIn2)
 
 	if code := myClient.SetProcessCallback(process); code != 0 {
 		fmt.Println("Failed to set process callback:", jack.StrError(code))
