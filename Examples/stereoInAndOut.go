@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"os/signal"
 
 	"github.com/gordonklaus/portaudio"
 )
@@ -32,7 +35,12 @@ func main() {
 	if err := stream.Start(); err != nil {
 		log.Fatal(err)
 	}
+
 	defer stream.Stop()
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt)
+	<-sigCh
+	fmt.Println("Exiting...")
 }
 
 func processAudio(in, out []int16) {
