@@ -31,10 +31,7 @@ func process(nframes uint32) int {
 			intSample := AudioSampleToInt16(sample)
 			samplesOut[i2] = int16ToAudioSample(intSample)
 			fmt.Println("Sample: ", intSample)
-			if samplesOut[i2] > jack.AudioSample(maxFloat) {
-				maxFloat = float32(samplesOut[i2])
-				fmt.Println("Max Float: ", maxFloat)
-			}
+			fmt.Println("SampleFloat: ", samplesOut[i2])
 		}
 	}
 	return 0
