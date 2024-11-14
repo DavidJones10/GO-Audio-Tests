@@ -57,7 +57,7 @@ func main() {
 				fmt.Println(err)
 				return fmt.Errorf("error writing to playback device, %w", err)
 			}
-			time.Sleep(time.Millisecond * 20)
+			time.Sleep(time.Millisecond * 30)
 		}
 	}()
 
