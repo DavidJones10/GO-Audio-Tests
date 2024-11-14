@@ -7,7 +7,7 @@ import (
 )
 
 const sampleRate = 44100
-const bufferSize = 512
+const bufferSize = 2048
 const numChannels = 2
 
 func main() {
