@@ -1,4 +1,2 @@
-github.com/cocoonlife/goalsa v0.0.0-20230731174733-19b297509b2e h1:qyp/y41c33saXW6HLjjbYn5pe8fCyDyXmXWN1dno1Jk=
-github.com/cocoonlife/goalsa v0.0.0-20230731174733-19b297509b2e/go.mod h1:5aLO409bJnd+jCw0t/SB/DhHkVBhPAE31lnHJnYQxy0=
-github.com/cocoonlife/testify v0.0.0-20160218172820-792cc1faeb64 h1:LjPYdzoFSAJ5Tr/ElL8kzTJghXgpnOjJVbgd1UvZB1o=
-github.com/cocoonlife/testify v0.0.0-20160218172820-792cc1faeb64/go.mod h1:LoCAz53rbPcqs8Da2BjB/yDy4gxMtiSQmqnYI/DGH+U=
+github.com/Binozo/GoAlsa v0.0.0-20240908110524-75e09c4e2e06 h1:o7fnTe7uwmrXg00mRxPn1JvLiJNTnB6U7hRcJ+6reTg=
+github.com/Binozo/GoAlsa v0.0.0-20240908110524-75e09c4e2e06/go.mod h1:xshAGZHcr37OF3EAWM6fITj0YHs0z3qD35sBYW/bQLw=

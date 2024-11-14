@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"time"
 
-	"github.com/cocoonlife/goalsa"
+	"github.com/Binozo/GoAlsa/pkg/alsa"
 )
 
 const SAMPLE_RATE = 16000
@@ -14,27 +13,32 @@ const BUFFER_SIZE = 480
 
 func main() {
 	//hw:<CARD_NR>,<DEVICE_NR>
-	bufParams := alsa.BufferParams{
-		BufferFrames: 1920,
-		PeriodFrames: 480,
-		Periods:      4,
+	// bufParams := alsa.BufferParams{
+	// 	BufferFrames: 1920,
+	// 	PeriodFrames: 480,
+	// 	Periods:      4,
+	// }
+	audioConfig := alsa.Config{
+		Channels:   2,
+		Format:     alsa.FormatS16LE,
+		SampleRate: SAMPLE_RATE,
 	}
-	captureDevice, err := alsa.NewCaptureDevice("hw:2,0", 2, alsa.FormatS16LE, SAMPLE_RATE, bufParams)
+	captureDevice, err := alsa.NewCaptureDevice("hw:2,0", audioConfig)
 	if err != nil {
 		panic(err)
 	}
 	defer captureDevice.Close()
 
-	playbackDevice, err := alsa.NewPlaybackDevice("hw:2,0", 2, alsa.FormatS16LE, SAMPLE_RATE, bufParams)
+	playbackDevice, err := alsa.NewPlaybackDevice("hw:2,0", audioConfig)
 	if err != nil {
 		panic(err)
 	}
 	defer playbackDevice.Close()
 
-	captureDevice.StartReadThread()
+	//captureDevice.StartReadThread()
 
-	readBuffer := make([]int16, 480*2)
-	writeBuffer := make([]int16, 480*2)
+	readBuffer := make([]float32, 480*2)
+	writeBuffer := make([]float32, 480*2)
 
 	go func() (err error) {
 		for {
@@ -49,7 +53,6 @@ func main() {
 			if err != nil {
 				return fmt.Errorf("error writing to playback device")
 			}
-			time.Sleep(25 * time.Millisecond)
 
 		}
 	}()
