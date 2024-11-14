@@ -28,21 +28,21 @@ func process(nframes uint32) int {
 func main() {
 	myClient, status := jack.ClientOpen("Go Passthrough", jack.NoStartServer)
 	if status != 0 {
-		fmt.Println("Status:", jack.StrError(status))
+		fmt.Println("Status1:", jack.StrError(status))
 		return
 	}
 	defer myClient.Close()
 
-	echoCancelSource, status := jack.ClientOpen("Echo-Cancel Source", jack.LoadName)
+	echoCancelSource, status := jack.ClientOpen("Echo-Cancel Source", jack.NoStartServer)
 	if status != 0 {
-		fmt.Println("Status:", jack.StrError(status))
+		fmt.Println("Status2:", jack.StrError(status))
 		return
 	}
 	defer echoCancelSource.Close()
 
-	echoCancelSink, status := jack.ClientOpen("Echo-Cancel Sink", jack.LoadName)
+	echoCancelSink, status := jack.ClientOpen("Echo-Cancel Sink", jack.NoStartServer)
 	if status != 0 {
-		fmt.Println("Status:", jack.StrError(status))
+		fmt.Println("Status3:", jack.StrError(status))
 		return
 	}
 	defer echoCancelSink.Close()
