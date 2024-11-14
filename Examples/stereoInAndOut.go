@@ -1,56 +1,52 @@
 package main
 
 import (
-	"fmt"
-	"time"
+	"log"
 
 	"github.com/gordonklaus/portaudio"
 )
 
+const sampleRate = 44100
+const bufferSize = 512
+const numChannels = 2
+
 func main() {
-	portaudio.Initialize()
-	defer portaudio.Terminate()
-	e := newEcho(time.Second / 1)
-	defer e.Close()
-	chk(e.Start())
-	time.Sleep(40 * time.Second)
-	chk(e.Stop())
-}
-
-type echo struct {
-	*portaudio.Stream
-	buffer []float32
-	i      int
-}
-
-func newEcho(delay time.Duration) *echo {
-	h, err := portaudio.DefaultHostApi()
-	chk(err)
-	fmt.Println(h.DefaultInputDevice.MaxInputChannels)
-	fmt.Println(h.DefaultOutputDevice.MaxOutputChannels)
-	fmt.Println(h.Name)
-	fmt.Println(h.DefaultInputDevice.Name)
-	fmt.Println(h.DefaultOutputDevice.Name)
-
-	p := portaudio.LowLatencyParameters(h.DefaultInputDevice, h.DefaultOutputDevice)
-	p.Input.Channels = 1
-	p.Output.Channels = 1
-	fmt.Println("made it 1")
-	e := &echo{buffer: make([]float32, int(p.SampleRate*delay.Seconds()))}
-	e.Stream, err = portaudio.OpenStream(p, e.processAudio)
-	fmt.Println("made it 2")
-	chk(err)
-	return e
-}
-
-func (e *echo) processAudio(in, out []float32) {
-	for i := range out {
-		out[i] = in[i]
+	// Initialize PortAudio
+	if err := portaudio.Initialize(); err != nil {
+		log.Fatal(err)
 	}
-}
+	defer portaudio.Terminate()
 
-func chk(err error) {
+	// Create an input buffer to store the incoming audio data
+	inputBuffer := make([]int16, bufferSize*numChannels)
+	outputBuffer := make([]int16, bufferSize*numChannels)
+
+	// Open the default input and output streams
+	stream, err := portaudio.OpenDefaultStream(numChannels, numChannels, sampleRate, bufferSize, inputBuffer)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+	}
+	defer stream.Close()
+
+	// Start the stream
+	if err := stream.Start(); err != nil {
+		log.Fatal(err)
+	}
+	defer stream.Stop()
+
+	// Main loop to read input and immediately write it to the output
+	for {
+		// Read input audio
+		if err := stream.Read(); err != nil {
+			log.Fatal(err)
+		}
+
+		// Copy the input to the output buffer (loopback)
+		copy(outputBuffer, inputBuffer)
+
+		// Write output audio
+		if err := stream.Write(); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
