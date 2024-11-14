@@ -1,8 +1,13 @@
 package main
 
-import "github.com/cocoonlife/goalsa"
+import (
+	"fmt"
+
+	"github.com/cocoonlife/goalsa"
+)
 
 const SAMPLE_RATE = 16000
+const BUFFER_SIZE = 480
 
 func main() {
 	//hw:<CARD_NR>,<DEVICE_NR>
@@ -16,4 +21,18 @@ func main() {
 		panic(err)
 	}
 	defer captureDevice.Close()
+
+	captureDevice.StartReadThread()
+	readBuffer := make([]int16, 480*2)
+
+	go func() (err error) {
+		for {
+			numSamples, err := captureDevice.Read(readBuffer)
+			fmt.Println("Num samples in last read: ", numSamples)
+			if err != nil {
+				return fmt.Errorf("error reading capture device")
+			}
+
+		}
+	}()
 }
