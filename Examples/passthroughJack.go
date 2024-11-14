@@ -21,7 +21,7 @@ func process(nframes uint32) int {
 			count += 1
 		}
 	}
-	fmt.Println("Samples Processed: %v", count)
+	fmt.Println("Samples Processed: ", count)
 	return 0
 }
 
