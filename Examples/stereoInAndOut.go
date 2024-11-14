@@ -51,13 +51,13 @@ func main() {
 			for i := 0; i < len(readBuffer); i++ {
 				writeBuffer[i] = readBuffer[i]
 			}
+			time.Sleep(time.Millisecond * 30)
 			numSamples, err = playbackDevice.Write(writeBuffer)
 			if err != nil {
 				//fmt.Println("Num samples in last write: ", numSamples)
 				fmt.Println(err)
 				return fmt.Errorf("error writing to playback device, %w", err)
 			}
-			time.Sleep(time.Millisecond * 30)
 		}
 	}()
 
