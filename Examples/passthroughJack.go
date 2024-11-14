@@ -12,16 +12,14 @@ var PortsIn []*jack.Port
 var PortsOut []*jack.Port
 
 func process(nframes uint32) int {
-	count := 0
 	for i, in := range PortsIn {
 		samplesIn := in.GetBuffer(nframes)
 		samplesOut := PortsOut[i].GetBuffer(nframes)
 		for i2, sample := range samplesIn {
 			samplesOut[i2] = sample
-			count += 1
+			fmt.Println("Sample: ", sample)
 		}
 	}
-	//fmt.Println("Samples Processed: ", count)
 	return 0
 }
 
