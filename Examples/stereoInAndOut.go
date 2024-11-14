@@ -32,7 +32,6 @@ func newEcho(delay time.Duration) *echo {
 	fmt.Println(h.DefaultInputDevice.Name)
 	fmt.Println(h.DefaultOutputDevice.Name)
 
-	h.DefaultInputDevice.Name = "hw:2,0"
 	p := portaudio.LowLatencyParameters(h.DefaultInputDevice, h.DefaultOutputDevice)
 	p.Input.Channels = 1
 	p.Output.Channels = 1
@@ -46,9 +45,7 @@ func newEcho(delay time.Duration) *echo {
 
 func (e *echo) processAudio(in, out []float32) {
 	for i := range out {
-		out[i] = .7 * e.buffer[e.i]
-		e.buffer[e.i] = in[i]
-		e.i = (e.i + 1) % len(e.buffer)
+		out[i] = in[i]
 	}
 }
 
