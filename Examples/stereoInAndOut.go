@@ -26,10 +26,13 @@ type echo struct {
 func newEcho(delay time.Duration) *echo {
 	h, err := portaudio.DefaultHostApi()
 	chk(err)
-	fmt.Println(h.DefaultInputDevice)
-	fmt.Println(h.Devices)
+	fmt.Println(h.DefaultInputDevice.MaxInputChannels)
+	fmt.Println(h.DefaultOutputDevice.MaxOutputChannels)
 	fmt.Println(h.Name)
 	fmt.Println(h.DefaultInputDevice.Name)
+	fmt.Println(h.DefaultOutputDevice.Name)
+
+	h.DefaultInputDevice.Name = "hw:2,0"
 	p := portaudio.LowLatencyParameters(h.DefaultInputDevice, h.DefaultOutputDevice)
 	p.Input.Channels = 1
 	p.Output.Channels = 1
