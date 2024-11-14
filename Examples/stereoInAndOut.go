@@ -1,59 +1,54 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/xthexder/go-jack"
+	"github.com/gordonklaus/portaudio"
 )
 
-var channels int = 2
-
-var PortsIn []*jack.Port
-var PortsOut []*jack.Port
-
-func process(nframes uint32) int {
-	for i, in := range PortsIn {
-		samplesIn := in.GetBuffer(nframes)
-		samplesOut := PortsOut[i].GetBuffer(nframes)
-		for i2, sample := range samplesIn {
-			samplesOut[i2] = sample
-		}
-	}
-	return 0
-}
+const BUFFER_SIZE = 480
+const SAMPLE_RATE = 16000
 
 func main() {
-	client, status := jack.ClientOpen("Go Passthrough", jack.NoStartServer)
-	if status != 0 {
-		fmt.Println("Status:", jack.StrError(status))
-		return
-	}
-	defer client.Close()
+	portaudio.Initialize()
+	defer portaudio.Terminate()
 
-	for i := 0; i < channels; i++ {
-		portIn := client.PortRegister(fmt.Sprintf("in_%d", i), jack.DEFAULT_AUDIO_TYPE, jack.PortIsInput, 0)
-		PortsIn = append(PortsIn, portIn)
+	inBuf := make([][]int16, 2) // 2 channels
+	for i := range inBuf {
+		inBuf[i] = make([]int16, BUFFER_SIZE)
 	}
-	for i := 0; i < channels; i++ {
-		portOut := client.PortRegister(fmt.Sprintf("out_%d", i), jack.DEFAULT_AUDIO_TYPE, jack.PortIsOutput, 0)
-		PortsOut = append(PortsOut, portOut)
+	inStream, err := portaudio.OpenDefaultStream(2, 0, SAMPLE_RATE, BUFFER_SIZE, inBuf)
+	if err != nil {
+		panic(err)
 	}
 
-	if code := client.SetProcessCallback(process); code != 0 {
-		fmt.Println("Failed to set process callback:", jack.StrError(code))
-		return
+	outBuf := make([][]int16, 2) // 2 channels
+	for i := range outBuf {
+		outBuf[i] = make([]int16, BUFFER_SIZE)
 	}
-	shutdown := make(chan struct{})
-	client.OnShutdown(func() {
-		fmt.Println("Shutting down")
-		close(shutdown)
-	})
-
-	if code := client.Activate(); code != 0 {
-		fmt.Println("Failed to activate client:", jack.StrError(code))
-		return
+	outStream, err := portaudio.OpenDefaultStream(0, 2, SAMPLE_RATE, BUFFER_SIZE, outBuf)
+	if err != nil {
+		panic(err)
 	}
 
-	fmt.Println(client.GetName())
-	<-shutdown
+	inStream.Start()
+	outStream.Start()
+
+	go processAudio(inStream, outStream, inBuf, outBuf)
+
+}
+
+func processAudio(inputStream *portaudio.Stream, outputStream *portaudio.Stream, inputBuffer [][]int16, outputBuffer [][]int16) {
+	for {
+		if err := inputStream.Read(); err != nil {
+			panic(err)
+		}
+
+		for channel := 0; channel < 2; channel++ {
+			for i := 0; i < BUFFER_SIZE; i++ {
+				outputBuffer[channel][i] = inputBuffer[channel][i] // Loop input to output
+			}
+		}
+		if err := outputStream.Write(); err != nil {
+			panic(err)
+		}
+	}
 }
