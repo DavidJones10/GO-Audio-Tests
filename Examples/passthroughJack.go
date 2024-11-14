@@ -22,6 +22,7 @@ func AudioSampleToInt16(sample jack.AudioSample) int16 {
 }
 
 func process(nframes uint32) int {
+	maxFloat := float32(0)
 	for i, in := range PortsIn {
 		samplesIn := in.GetBuffer(nframes)
 		samplesOut := PortsOut[i].GetBuffer(nframes)
@@ -29,6 +30,9 @@ func process(nframes uint32) int {
 			intSample := AudioSampleToInt16(sample)
 			samplesOut[i2] = int16ToAudioSample(intSample)
 			fmt.Println("Sample: ", intSample)
+			if samplesOut[i2] > jack.AudioSample(maxFloat) {
+				fmt.Println("Max Float: ", maxFloat)
+			}
 		}
 	}
 	return 0
