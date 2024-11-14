@@ -1,68 +1,59 @@
-package main
+ackage main
 
 import (
 	"fmt"
-	"os"
-	"os/signal"
-	"time"
 
-	"github.com/Binozo/GoAlsa/pkg/alsa"
+	"github.com/xthexder/go-jack"
 )
 
-const SAMPLE_RATE = 16000
-const BUFFER_SIZE = 480
+var channels int = 2
+
+var PortsIn []*jack.Port
+var PortsOut []*jack.Port
+
+func process(nframes uint32) int {
+	for i, in := range PortsIn {
+		samplesIn := in.GetBuffer(nframes)
+		samplesOut := PortsOut[i].GetBuffer(nframes)
+		for i2, sample := range samplesIn {
+			samplesOut[i2] = sample
+		}
+	}
+	return 0
+}
 
 func main() {
-	//hw:<CARD_NR>,<DEVICE_NR>
-	// bufParams := alsa.BufferParams{
-	// 	BufferFrames: 1920,
-	// 	PeriodFrames: 480,
-	// 	Periods:      4,
-	// }
-	audioConfig := alsa.Config{
-		Channels:   2,
-		Format:     alsa.FormatS16LE,
-		SampleRate: SAMPLE_RATE,
+	client, status := jack.ClientOpen("Go Passthrough", jack.NoStartServer)
+	if status != 0 {
+		fmt.Println("Status:", jack.StrError(status))
+		return
 	}
-	captureDevice, err := alsa.NewCaptureDevice("hw:2,0", audioConfig)
-	if err != nil {
-		panic(err)
+	defer client.Close()
+
+	for i := 0; i < channels; i++ {
+		portIn := client.PortRegister(fmt.Sprintf("in_%d", i), jack.DEFAULT_AUDIO_TYPE, jack.PortIsInput, 0)
+		PortsIn = append(PortsIn, portIn)
 	}
-	defer captureDevice.Close()
-
-	playbackDevice, err := alsa.NewPlaybackDevice("hw:2,0", audioConfig)
-	if err != nil {
-		panic(err)
+	for i := 0; i < channels; i++ {
+		portOut := client.PortRegister(fmt.Sprintf("out_%d", i), jack.DEFAULT_AUDIO_TYPE, jack.PortIsOutput, 0)
+		PortsOut = append(PortsOut, portOut)
 	}
-	defer playbackDevice.Close()
 
-	//captureDevice.StartReadThread()
+	if code := client.SetProcessCallback(process); code != 0 {
+		fmt.Println("Failed to set process callback:", jack.StrError(code))
+		return
+	}
+	shutdown := make(chan struct{})
+	client.OnShutdown(func() {
+		fmt.Println("Shutting down")
+		close(shutdown)
+	})
 
-	readBuffer := make([]float32, 480*2)
-	writeBuffer := make([]float32, 480*2)
+	if code := client.Activate(); code != 0 {
+		fmt.Println("Failed to activate client:", jack.StrError(code))
+		return
+	}
 
-	go func() (err error) {
-		for {
-			numSamples, err := captureDevice.Read(readBuffer)
-			if err != nil {
-				fmt.Println("Num samples in last read: ", numSamples)
-				return fmt.Errorf("error reading capture device, %w", err)
-			}
-			for i := 0; i < len(readBuffer); i++ {
-				writeBuffer[i] = readBuffer[i]
-			}
-			time.Sleep(time.Millisecond * 30)
-			numSamples, err = playbackDevice.Write(writeBuffer)
-			if err != nil {
-				//fmt.Println("Num samples in last write: ", numSamples)
-				fmt.Println(err)
-				return fmt.Errorf("error writing to playback device, %w", err)
-			}
-		}
-	}()
-
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, os.Interrupt)
-	<-sigCh
-	fmt.Println("Exiting...")
+	fmt.Println(client.GetName())
+	<-shutdown
 }
