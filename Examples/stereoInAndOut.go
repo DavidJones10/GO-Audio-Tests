@@ -22,7 +22,7 @@ func main() {
 	outputBuffer := make([]int16, bufferSize*numChannels)
 
 	// Open the default input and output streams
-	stream, err := portaudio.OpenDefaultStream(numChannels, numChannels, sampleRate, bufferSize, inputBuffer)
+	stream, err := portaudio.OpenDefaultStream(numChannels, numChannels, sampleRate, bufferSize, inputBuffer, outputBuffer)
 	if err != nil {
 		log.Fatal(err)
 	}
