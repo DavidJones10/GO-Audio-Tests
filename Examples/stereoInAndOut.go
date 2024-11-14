@@ -45,17 +45,17 @@ func main() {
 		for {
 			numSamples, err := captureDevice.Read(readBuffer)
 			if err != nil {
+				fmt.Println("Num samples in last read: ", numSamples)
 				return fmt.Errorf("error reading capture device, %w", err)
 			}
-			fmt.Println("Num samples in last read: ", numSamples)
 			for i := 0; i < len(readBuffer); i++ {
 				writeBuffer[i] = readBuffer[i]
 			}
 			numSamples, err = playbackDevice.Write(writeBuffer)
 			if err != nil {
+				fmt.Println("Num samples in last write: ", numSamples)
 				return fmt.Errorf("error writing to playback device, %w", err)
 			}
-			fmt.Println("Num samples in last write: ", numSamples)
 			time.Sleep(time.Millisecond * 20)
 		}
 	}()
