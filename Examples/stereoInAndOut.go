@@ -24,8 +24,16 @@ func main() {
 	}
 	defer captureDevice.Close()
 
+	playbackDevice, err := alsa.NewPlaybackDevice("hw:2,0", 2, alsa.FormatS16LE, SAMPLE_RATE, bufParams)
+	if err != nil {
+		panic(err)
+	}
+	defer playbackDevice.Close()
+
 	captureDevice.StartReadThread()
+
 	readBuffer := make([]int16, 480*2)
+	writeBuffer := make([]int16, 480*2)
 
 	go func() (err error) {
 		for {
@@ -33,6 +41,12 @@ func main() {
 			fmt.Println("Num samples in last read: ", numSamples)
 			if err != nil {
 				return fmt.Errorf("error reading capture device")
+			}
+			copy(writeBuffer, readBuffer)
+			numSamples, err = playbackDevice.Write(writeBuffer)
+			fmt.Println("Num samples in last write: ", numSamples)
+			if err != nil {
+				return fmt.Errorf("error writing to capture device")
 			}
 
 		}
