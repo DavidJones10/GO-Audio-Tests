@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gordonklaus/portaudio"
@@ -25,6 +26,10 @@ type echo struct {
 func newEcho(delay time.Duration) *echo {
 	h, err := portaudio.DefaultHostApi()
 	chk(err)
+	fmt.Println(h.DefaultInputDevice)
+	fmt.Println(h.Devices)
+	fmt.Println(h.Name)
+	fmt.Println(h.DefaultInputDevice.Name)
 	p := portaudio.LowLatencyParameters(h.DefaultInputDevice, h.DefaultOutputDevice)
 	p.Input.Channels = 1
 	p.Output.Channels = 1
