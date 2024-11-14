@@ -12,13 +12,13 @@ func main() {
 	defer portaudio.Terminate()
 
 	inBuf := make([][]int16, BUFFER_SIZE)
-	inStream, err := portaudio.OpenDefaultStream(2, 0, SAMPLE_RATE, BUFFER_SIZE, inBuf)
+	inStream, err := portaudio.OpenDefaultStream(1, 0, SAMPLE_RATE, BUFFER_SIZE, inBuf)
 	if err != nil {
 		panic(err)
 	}
 
 	outBuf := make([][]int16, BUFFER_SIZE)
-	outStream, err := portaudio.OpenDefaultStream(0, 2, SAMPLE_RATE, BUFFER_SIZE, outBuf)
+	outStream, err := portaudio.OpenDefaultStream(0, 1, SAMPLE_RATE, BUFFER_SIZE, outBuf)
 	if err != nil {
 		panic(err)
 	}
@@ -36,7 +36,7 @@ func processAudio(inputStream *portaudio.Stream, outputStream *portaudio.Stream,
 			panic(err)
 		}
 
-		for channel := 0; channel < 2; channel++ {
+		for channel := 0; channel < 1; channel++ {
 			for i := 0; i < BUFFER_SIZE; i++ {
 				outputBuffer[channel][i] = inputBuffer[channel][i] // Loop input to output
 			}
