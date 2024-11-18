@@ -9,7 +9,7 @@ import (
 	"github.com/xthexder/go-jack"
 )
 
-var channels int = 2
+var channels int = 1
 
 var PortsIn []*jack.Port
 var PortsOut []*jack.Port
