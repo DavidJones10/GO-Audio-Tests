@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/binary"
 	"fmt"
+	"math"
 	"os"
 
 	"github.com/xthexder/go-jack"
@@ -16,6 +17,15 @@ var PortsOut []*jack.Port
 // Global audio buffer and index
 var audioBuffer []int16
 var playbackIndex int = 0
+
+func int16ToAudioSample(sample int16) jack.AudioSample {
+	return jack.AudioSample(float32(sample) / 32767)
+}
+
+func AudioSampleToInt16(sample jack.AudioSample) int16 {
+	clamped := math.Max(-1.0, math.Min(1.0, float64(sample)))
+	return int16(clamped * 32767)
+}
 
 func process(nframes uint32) int {
 	if playbackIndex >= len(audioBuffer) {
