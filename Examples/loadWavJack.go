@@ -104,7 +104,7 @@ func main() {
 	PortsOut = append(PortsOut, portOut1, portOut2)
 
 	// Load the WAV file
-	err := loadWavFile("../../CantinaBand3.wav")
+	err := loadWavFile("../CantinaBand3.wav")
 	if err != nil {
 		fmt.Println("Error loading WAV file:", err)
 		return
